@@ -31,11 +31,15 @@ const UtilityPage = ({ isLoggedIn }) => {
             onPress={() => navigation.navigate(item.screen)}
             style={styles.menuItem}
           >
-            <View style={styles.iconWrapper}>
-              <Icon name={item.icon} size={40} color="#2563EB" /> {/* Blue icon */}
+            <View style={styles.itemContent}>
+              <View style={styles.iconWrapper}>
+                <Icon name={item.icon} size={40} color="#2563EB" />
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={styles.menuText}>{item.name}</Text>
+                <Text style={styles.menuDescription}>{item.description}</Text>
+              </View>
             </View>
-            <Text style={styles.menuText}>{item.name}</Text>
-            <Text style={styles.menuDescription}>{item.description}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -75,18 +79,23 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 3,
   },
+  itemContent: {
+    alignItems: 'center',
+  },
   iconWrapper: {
     backgroundColor: '#b3d9f7',
     padding: 15,
     borderRadius: 30,
     marginBottom: 10,
+  },
+  textContainer: {
+    alignItems: 'center',
   },
   menuText: {
     fontSize: 18,
