@@ -277,12 +277,6 @@ This project is licensed under the **0BSD License** - see the [LICENSE](LICENSE)
 
 Developed with ❤️ by our SIH 2024 team:
 
-- **[Your Name]** - Team Lead & Mobile Developer
-- **[Team Member 2]** - Backend Developer
-- **[Team Member 3]** - AI/ML Engineer
-- **[Team Member 4]** - UI/UX Designer
-- **[Team Member 5]** - Legal Consultant
-- **[Team Member 6]** - Quality Assurance
 
 ## 🏆 Achievements
 
@@ -291,12 +285,6 @@ Developed with ❤️ by our SIH 2024 team:
 - 📱 **Best Mobile App** - User-friendly interface and functionality
 - 🤖 **AI Excellence** - Advanced natural language processing
 
-## 📞 Support & Contact
-
-- **Email**: support@lawai.com
-- **Website**: [www.lawai.com](https://lawai.com)
-- **Issues**: [GitHub Issues](https://github.com/your-username/LawAI-Mobile/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/LawAI-Mobile/discussions)
 
 ## 📈 Roadmap
 
