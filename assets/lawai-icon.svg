@@ -1,0 +1,32 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#0047AB" rx="200"/>
+
+  <!-- Scales of Justice -->
+  <g transform="translate(512, 512)">
+    <!-- Balance beam -->
+    <rect x="-200" y="-8" width="400" height="16" fill="#ffffff" rx="8"/>
+
+    <!-- Left scale -->
+    <g transform="translate(-150, 50)">
+      <path d="M-40,-40 L40,-40 L30,40 L-30,40 Z" fill="#ffffff"/>
+      <circle cx="0" cy="0" r="25" fill="none" stroke="#0047AB" stroke-width="3"/>
+      <text x="0" y="5" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#0047AB">L</text>
+    </g>
+
+    <!-- Right scale -->
+    <g transform="translate(150, 50)">
+      <path d="M-40,-40 L40,-40 L30,40 L-30,40 Z" fill="#ffffff"/>
+      <circle cx="0" cy="0" r="25" fill="none" stroke="#0047AB" stroke-width="3"/>
+      <text x="0" y="5" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#0047AB">A</text>
+    </g>
+
+    <!-- Center pivot -->
+    <circle cx="0" cy="-20" r="12" fill="#ffffff"/>
+    <rect x="-3" y="-50" width="6" height="30" fill="#ffffff"/>
+  </g>
+
+  <!-- LawAI Text -->
+  <text x="512" y="750" text-anchor="middle" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="#ffffff">LawAI</text>
+  <text x="512" y="820" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" fill="#E0E7FF">Justice & Technology</text>
+</svg>
