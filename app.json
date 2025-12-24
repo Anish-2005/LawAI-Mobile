@@ -13,19 +13,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#0047AB"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lawai.com.lawai",
       "buildNumber": "1.0.0"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0047AB"
-      },
       "package": "com.lawai.com.lawai",
       "permissions": [
         "android.permission.INTERNET",
