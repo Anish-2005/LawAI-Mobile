@@ -1,46 +1,160 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, FlatList, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Buffer } from 'buffer';
+import OriginalDocumentsHeader from '../components/OriginalDocuments/OriginalDocumentsHeader';
+import SearchBar from '../components/OriginalDocuments/SearchBar';
+import PdfCard from '../components/OriginalDocuments/PdfCard';
+import LoadingState from '../components/OriginalDocuments/LoadingState';
+import ErrorState from '../components/OriginalDocuments/ErrorState';
+import EmptyState from '../components/OriginalDocuments/EmptyState';
+
+interface PdfItem {
+  id: number;
+  act_name: string;
+  description: string;
+}
+
+// Dummy data fallback for when API fails
+const dummyPdfData: PdfItem[] = [
+  {
+    id: 1,
+    act_name: "Indian Penal Code (IPC) 1860",
+    description: "Complete text of the Indian Penal Code containing criminal law provisions and punishments."
+  },
+  {
+    id: 2,
+    act_name: "Code of Criminal Procedure (CrPC) 1973",
+    description: "Comprehensive guide to criminal procedure and court processes in India."
+  },
+  {
+    id: 3,
+    act_name: "Indian Evidence Act 1872",
+    description: "Laws governing the admissibility and relevance of evidence in Indian courts."
+  },
+  {
+    id: 4,
+    act_name: "Motor Vehicles Act 1988",
+    description: "Regulations for road transport, vehicle registration, and traffic rules."
+  },
+  {
+    id: 5,
+    act_name: "Negotiable Instruments Act 1881",
+    description: "Laws related to cheques, bills of exchange, and promissory notes."
+  },
+  {
+    id: 6,
+    act_name: "Indian Contract Act 1872",
+    description: "Fundamental principles of contract law and agreements in India."
+  },
+  {
+    id: 7,
+    act_name: "Companies Act 2013",
+    description: "Corporate law governing company formation, management, and governance."
+  },
+  {
+    id: 8,
+    act_name: "Income Tax Act 1961",
+    description: "Taxation laws and regulations for income and corporate taxation."
+  },
+  {
+    id: 9,
+    act_name: "Constitution of India 1950",
+    description: "The supreme law of India containing fundamental rights, directive principles, and governance structure."
+  },
+  {
+    id: 10,
+    act_name: "Civil Procedure Code (CPC) 1908",
+    description: "Rules and procedures for civil litigation and court proceedings in India."
+  },
+  {
+    id: 11,
+    act_name: "Hindu Marriage Act 1955",
+    description: "Laws governing marriage, divorce, and matrimonial disputes for Hindus."
+  },
+  {
+    id: 12,
+    act_name: "Transfer of Property Act 1882",
+    description: "Laws regulating the transfer of immovable property and related transactions."
+  },
+  {
+    id: 13,
+    act_name: "Indian Succession Act 1925",
+    description: "Laws governing inheritance, wills, and succession of property."
+  },
+  {
+    id: 14,
+    act_name: "Consumer Protection Act 2019",
+    description: "Rights and remedies available to consumers against unfair trade practices."
+  },
+  {
+    id: 15,
+    act_name: "Right to Information Act 2005",
+    description: "Law guaranteeing citizens' right to access government information."
+  },
+  {
+    id: 16,
+    act_name: "Protection of Children from Sexual Offences (POCSO) Act 2012",
+    description: "Special law for protection of children from sexual abuse and exploitation."
+  },
+  {
+    id: 17,
+    act_name: "Domestic Violence Act 2005",
+    description: "Protection of women from domestic violence and abuse."
+  },
+  {
+    id: 18,
+    act_name: "Information Technology Act 2000",
+    description: "Laws governing cyber crimes, electronic commerce, and digital signatures."
+  },
+  {
+    id: 19,
+    act_name: "Environmental Protection Act 1986",
+    description: "Framework for protection and improvement of environmental quality."
+  },
+  {
+    id: 20,
+    act_name: "Labour Laws (Consolidated)",
+    description: "Collection of important labour laws including Factories Act, Minimum Wages Act, and others."
+  }
+];
 
 const OriginalDocuments = () => {
-  const [pdfs, setPdfs] = useState([]);
-  const [filteredPdfs, setFilteredPdfs] = useState([]);
+  const [pdfs, setPdfs] = useState<PdfItem[]>([]);
+  const [filteredPdfs, setFilteredPdfs] = useState<PdfItem[]>([]);
   const [pdfSearchQuery, setPdfSearchQuery] = useState('');
-  const [pdfLoading, setPdfLoading] = useState(false);
-  const [pdfError, setPdfError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [downloadingIds, setDownloadingIds] = useState<Set<number>>(new Set());
 
 
   useEffect(() => {
-    // Fetch PDF metadata
     const fetchPdfs = async () => {
-      setPdfLoading(true);
-      setPdfError(null);
+      setLoading(true);
 
       try {
         const response = await axios.get('https://sih-backend-881i.onrender.com/pdfs/');
-        setPdfs(response.data); // Assuming the response contains the list of PDFs with metadata
-        setFilteredPdfs(response.data); // Set initial filtered PDFs to all PDFs
+        setPdfs(response.data);
+        setFilteredPdfs(response.data);
       } catch (err) {
-        setPdfError('Failed to fetch PDF data.');
         console.error('Error fetching PDFs:', err);
+        // Use dummy data as fallback
+        setPdfs(dummyPdfData);
+        setFilteredPdfs(dummyPdfData);
       } finally {
-        setPdfLoading(false);
+        setLoading(false);
       }
     };
 
     fetchPdfs();
   }, []);
 
-  // Function to handle PDF search input change
-  const handlePdfSearchChange = (query) => {
+  const handlePdfSearchChange = (query: string) => {
     setPdfSearchQuery(query);
 
-    // Filter PDFs based on the search query
     if (query === '') {
-      setFilteredPdfs(pdfs); // Show all PDFs if no query
+      setFilteredPdfs(pdfs);
     } else {
       const filtered = pdfs.filter((pdf) =>
         pdf.act_name.toLowerCase().includes(query.toLowerCase()) ||
@@ -50,73 +164,85 @@ const OriginalDocuments = () => {
     }
   };
 
-  const handleDownloadPdf = async (pdfId) => {
-    setPdfLoading(true); // Show loading indicator
-    setPdfError(null); // Clear any previous errors
-  
+  const handleDownloadPdf = async (pdfId: number) => {
+    // Check if we're using dummy data (offline mode)
+    const isUsingDummyData = pdfs === dummyPdfData;
+
+    if (isUsingDummyData) {
+      Alert.alert(
+        'Offline Mode',
+        'Document downloads are not available while using sample data. Please check your internet connection and try again when the server is online.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    setDownloadingIds(prev => new Set(prev).add(pdfId));
+    setError(null);
+
     try {
-      // Fetch the PDF file URL from the server
       const response = await axios.get(
         `https://sih-backend-881i.onrender.com/pdfs/${pdfId}/download/`,
-        { responseType: 'arraybuffer' } // Use 'arraybuffer' for binary data handling in React Native
+        { responseType: 'arraybuffer' }
       );
-  
-      // Convert the arraybuffer data to base64 string
+
       const base64Data = Buffer.from(response.data, 'binary').toString('base64');
-  
-      // Create a temporary file path in the cache directory
       const fileUri = `${(FileSystem as any).cacheDirectory}Document_${pdfId}.pdf`;
 
-      // Write the base64 string to the file system
       await FileSystem.writeAsStringAsync(fileUri, base64Data, {
         encoding: 'base64',
       });
-  
-      // Check if the file can be shared
+
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(fileUri);
       } else {
         Alert.alert('Download Complete', `File saved to ${fileUri}`);
       }
     } catch (err) {
-      setPdfError('Failed to fetch PDF data.');
-      console.error('Error fetching PDF:', err);
+      console.error('Error downloading PDF:', err);
+      Alert.alert('Download Failed', 'Failed to download the document. Please try again.');
     } finally {
-      setPdfLoading(false); // Hide the loading indicator once download completes or fails
+      setDownloadingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(pdfId);
+        return newSet;
+      });
     }
   };
   return (
     <View style={styles.container}>
-      <Text>(Interet required for Downloading the PDFs)</Text>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search PDFs"
-        value={pdfSearchQuery}
-        onChangeText={handlePdfSearchChange}
+      <OriginalDocumentsHeader
+        title="Original Documents"
+        subtitle={pdfs === dummyPdfData ? "Offline Mode - Sample Documents" : "Download official legal documents and PDFs"}
       />
 
-      {pdfLoading ? (
-        <ActivityIndicator size="large" color="#2563EB" style={styles.loader} />
-      ) : pdfError ? (
-        <Text style={styles.errorText}>{pdfError}</Text>
+      {pdfs === dummyPdfData && (
+        <View style={styles.offlineBanner}>
+          <Text style={styles.offlineText}>📋 Using sample documents - Server temporarily unavailable</Text>
+        </View>
+      )}
+
+      <SearchBar
+        value={pdfSearchQuery}
+        onChangeText={handlePdfSearchChange}
+        placeholder="Search documents by name or description..."
+      />
+
+      {loading ? (
+        <LoadingState message="Loading documents..." />
       ) : (
         <FlatList
           data={filteredPdfs}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View style={styles.pdfItem}>
-              <View style={styles.pdfInfo}>
-                <Text style={styles.pdfName}>{item.act_name}</Text>
-                <Text style={styles.pdfDescription}>{item.description}</Text>
-              </View>
-              <TouchableOpacity
-                style={styles.downloadButton}
-                onPress={() => handleDownloadPdf(item.id)}
-              >
-                <Text style={styles.downloadText}>Download</Text>
-              </TouchableOpacity>
-            </View>
+            <PdfCard
+              pdf={item}
+              onDownload={handleDownloadPdf}
+              isDownloading={downloadingIds.has(item.id)}
+            />
           )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
         />
       )}
     </View>
@@ -126,72 +252,27 @@ const OriginalDocuments = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f4f4',
+    backgroundColor: '#f8fafc',
+  },
+  offlineBanner: {
+    backgroundColor: '#FEF3C7',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginHorizontal: 20,
+    marginBottom: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#F59E0B',
+  },
+  offlineText: {
+    color: '#92400E',
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  listContainer: {
     padding: 20,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: 15,
-  },
-  searchInput: {
-    backgroundColor: '#fff',
-    padding: 10,
-    fontSize: 16,
-    borderRadius: 8,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    marginBottom: 20,
-  },
-  loader: {
-    marginTop: 20,
-  },
-  errorText: {
-    color: '#ff0000',
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  pdfItem: {
-    backgroundColor: '#fff',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  pdfInfo: {
-    flex: 1,
-  },
-  pdfName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-  },
-  pdfDescription: {
-    fontSize: 14,
-    color: '#555',
-    marginTop: 5,
-  },
-  downloadButton: {
-    backgroundColor: '#2563EB',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  downloadText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  
 });
 
 export default OriginalDocuments;

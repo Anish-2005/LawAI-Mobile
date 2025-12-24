@@ -1,40 +1,54 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface OriginalDocumentsHeaderProps {
-  title?: string;
-  subtitle?: string;
+  title: string;
+  subtitle: string;
+  iconName?: keyof typeof Ionicons.glyphMap;
+  iconColor?: string;
 }
 
 const OriginalDocumentsHeader: React.FC<OriginalDocumentsHeaderProps> = ({
-  title = "Original Documents",
-  subtitle = "Internet required for downloading PDFs"
+  title,
+  subtitle,
+  iconName = "document-text",
+  iconColor = '#1e3a8a'
 }) => {
   return (
     <View style={styles.header}>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
+      <View style={styles.headerContent}>
+        <Ionicons name={iconName} size={40} color="#fff" />
+        <Text style={styles.headerTitle}>{title}</Text>
+        <Text style={styles.headerSubtitle}>{subtitle}</Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
-    marginBottom: 20,
+    backgroundColor: '#1e3a8a',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  headerContent: {
     alignItems: 'center',
   },
-  title: {
+  headerTitle: {
     fontSize: 28,
-    fontWeight: '600',
-    color: '#1D4ED8',
-    textAlign: 'center',
-    marginBottom: 8,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 10,
+    marginBottom: 5,
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#6B7280',
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#e0e7ff',
     textAlign: 'center',
-    fontStyle: 'italic',
+    lineHeight: 22,
   },
 });
 
