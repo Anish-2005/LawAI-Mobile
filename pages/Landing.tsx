@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   getStartedButton: {
-    backgroundColor: '#facc15',
+    backgroundColor: '#f1a605ff',
   },
   ctaButtonText: {
     fontSize: 16,

@@ -100,32 +100,6 @@ const Vision = () => {
         </View>
       </View>
 
-      {/* Impact Section */}
-      <LinearGradient
-        colors={['#0047AB', '#6B46C1']}
-        style={styles.impactSection}
-      >
-        <Text style={styles.impactTitle}>Our Impact Goal</Text>
-        <Text style={styles.impactText}>
-          To reduce case processing time by 60%, improve accuracy in legal documentation by 80%,
-          and enhance officer productivity through intelligent automation.
-        </Text>
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>60%</Text>
-            <Text style={styles.statLabel}>Faster Processing</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>80%</Text>
-            <Text style={styles.statLabel}>Higher Accuracy</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>100%</Text>
-            <Text style={styles.statLabel}>Nationwide Coverage</Text>
-          </View>
-        </View>
-      </LinearGradient>
-
       {/* Call to Action */}
       <View style={styles.ctaSection}>
         <Text style={styles.ctaTitle}>Join Us in Shaping the Future</Text>
