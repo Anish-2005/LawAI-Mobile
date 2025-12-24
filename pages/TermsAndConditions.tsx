@@ -78,7 +78,7 @@ const TermsAndConditions = () => {
   );
 };
 
-const Section = ({ title, children }) => (
+const Section: React.FC<{ title?: string; children: React.ReactNode }> = ({ title, children }) => (
   <View style={styles.section}>
     {title && <Text style={styles.sectionTitle}>{title}</Text>}
     {children}

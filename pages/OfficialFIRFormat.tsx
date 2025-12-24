@@ -12,7 +12,8 @@ const OfficialFIRFormat = () => {
 
     try {
       // Path to where the file will be saved on the device
-      const fileUri = FileSystem.documentDirectory + 'FIR-Format.docx';
+      const baseDir = (FileSystem as any).documentDirectory ?? (FileSystem as any).cacheDirectory ?? '';
+      const fileUri = baseDir + 'FIR-Format.docx';
 
       // Download the .docx file from the provided URL and save it
       await FileSystem.downloadAsync(

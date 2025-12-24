@@ -28,12 +28,12 @@ const UtilityPage = ({ isLoggedIn }) => {
         {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => navigation.navigate(item.screen)}
+            onPress={() => navigation.navigate(item.screen as any)}
             style={styles.menuItem}
           >
             <View style={styles.itemContent}>
               <View style={styles.iconWrapper}>
-                <Icon name={item.icon} size={40} color="#2563EB" />
+                <Icon name={item.icon as any} size={40} color="#2563EB" />
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.menuText}>{item.name}</Text>

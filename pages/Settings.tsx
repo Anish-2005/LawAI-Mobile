@@ -56,7 +56,7 @@ const Settings: React.FC = () => {
           <Text style={styles.cardTitle}>Account Settings</Text>
         </View>
         <Text style={styles.cardText}>Manage your account details such as profile and email address.</Text>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EditProfile')}>
+        <TouchableOpacity style={styles.button} onPress={() => (navigation as any).navigate('EditProfile')}>
           <Text style={styles.buttonText}>Edit Profile</Text>
         </TouchableOpacity>
       </View>
@@ -67,7 +67,7 @@ const Settings: React.FC = () => {
           <Text style={styles.cardTitle}>Privacy Settings</Text>
         </View>
         <Text style={styles.cardText}>Control your data sharing preferences and visibility settings.</Text>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ManagePrivacy')}>
+        <TouchableOpacity style={styles.button} onPress={() => (navigation as any).navigate('ManagePrivacy')}>
           <Text style={styles.buttonText}>Manage Privacy</Text>
         </TouchableOpacity>
       </View>

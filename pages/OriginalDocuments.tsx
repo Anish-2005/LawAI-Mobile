@@ -65,11 +65,11 @@ const OriginalDocuments = () => {
       const base64Data = Buffer.from(response.data, 'binary').toString('base64');
   
       // Create a temporary file path in the cache directory
-      const fileUri = `${FileSystem.cacheDirectory}Document_${pdfId}.pdf`;
-  
+      const fileUri = `${(FileSystem as any).cacheDirectory}Document_${pdfId}.pdf`;
+
       // Write the base64 string to the file system
       await FileSystem.writeAsStringAsync(fileUri, base64Data, {
-        encoding: FileSystem.EncodingType.Base64,
+        encoding: 'base64',
       });
   
       // Check if the file can be shared
