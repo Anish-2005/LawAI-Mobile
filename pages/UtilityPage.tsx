@@ -4,7 +4,7 @@ import Icon from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 
 const UtilityPage = ({ isLoggedIn }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   const menuItems = [
     { name: 'AI Lawyer', icon: 'gavel', description: 'Ask legal queries and get answers from our AI lawyer.', screen: 'Query' },
@@ -28,7 +28,7 @@ const UtilityPage = ({ isLoggedIn }) => {
         {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => navigation.navigate(item.screen as any)}
+            onPress={() => navigation.navigate(item.screen)}
             style={styles.menuItem}
           >
             <View style={styles.itemContent}>

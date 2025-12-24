@@ -2,18 +2,27 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  Button,
-  TouchableOpacity,
   ScrollView,
-  StyleSheet
+  StyleSheet,
+  Alert,
 } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import { useNavigation } from '@react-navigation/native';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
+
+// Import components
+import FIRHeader from '../components/FIR/FIRHeader';
+import DownloadSection from '../components/FIR/DownloadSection';
+import FIRDetailsCard from '../components/FIR/FIRDetailsCard';
+import OffenceDetailsCard from '../components/FIR/OffenceDetailsCard';
+import ComplainantDetailsCard from '../components/FIR/ComplainantDetailsCard';
+import FormButton from '../components/FIR/FormButton';
 
 const FormToPDF = () => {
   const navigation = useNavigation();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [formData, setFormData] = useState({
     district: '',
     policeStation: '',
@@ -68,57 +77,97 @@ const FormToPDF = () => {
       [name]: value
     }));
   };
+
+  // Validate form
+  const validateForm = () => {
+    const requiredFields = ['district', 'policeStation', 'firNo', 'complainantName', 'address'];
+    for (const field of requiredFields) {
+      if (!formData[field].trim()) {
+        Alert.alert('Validation Error', `Please fill in the ${field.replace(/([A-Z])/g, ' $1').toLowerCase()} field.`);
+        return false;
+      }
+    }
+    return true;
+  };
   const downloadDocx = async () => {
-    setIsDownloading(true); // Start the download process
+    setIsDownloading(true);
 
     try {
-      // Path to where the file will be saved on the device
       const fileUri = FileSystem.documentDirectory + 'FIR-Format.docx';
 
-      // Download the .docx file from the provided URL and save it
       await FileSystem.downloadAsync(
-        'https://savelifefoundation.org/wp-content/uploads/2016/11/A1-Format-of-FIR-part-of-Step-I.docx', // URL of the FIR .docx file
+        'https://savelifefoundation.org/wp-content/uploads/2016/11/A1-Format-of-FIR-part-of-Step-I.docx',
         fileUri
       );
 
-      // Optionally, share the downloaded file if sharing is available
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(fileUri);
       } else {
-        Alert.alert('Sharing not available', 'Your device does not support sharing.');
+        Alert.alert(
+          'Download Complete',
+          'The FIR format has been downloaded and saved to your device.',
+          [{ text: 'OK' }]
+        );
       }
-
-      Alert.alert('Download Complete', 'The FIR format has been downloaded and saved.');
     } catch (error) {
       console.error('Error downloading the file:', error);
-      Alert.alert('Download Error', 'There was an issue downloading the FIR format.');
+      Alert.alert(
+        'Download Failed',
+        'There was an issue downloading the FIR format. Please check your internet connection and try again.',
+        [{ text: 'OK' }]
+      );
     } finally {
-      setIsDownloading(false); // End the download process
+      setIsDownloading(false);
     }
   };
 
   // Generate PDF
   const generatePDF = async () => {
+    if (!validateForm()) return;
+
+    setIsGeneratingPDF(true);
+
     const htmlContent = `
       <html>
       <head>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          h1, h2 { text-align: center; }
-          p { margin: 5px 0; }
-          .field { margin-bottom: 10px; }
-          .label { font-weight: bold; }
+          body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+          h1, h2 { text-align: center; color: #1e3a8a; }
+          .section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+          .field { margin: 8px 0; }
+          .label { font-weight: bold; color: #333; }
+          .value { margin-left: 10px; }
         </style>
       </head>
       <body>
         <h1>FORM – IF1 (Integrated Form)</h1>
         <h2>FIRST INFORMATION REPORT</h2>
-        <p class="field"><span class="label">District:</span> ${formData.district}</p>
-        <p class="field"><span class="label">Police Station:</span> ${formData.policeStation}</p>
-        <p class="field"><span class="label">Year:</span> ${formData.year}</p>
-        <p class="field"><span class="label">F.I.R. No:</span> ${formData.firNo}</p>
-        <p class="field"><span class="label">Date:</span> ${formData.date}</p>
-        <!-- Add other fields in the same format -->
+
+        <div class="section">
+          <h3>FIR Details</h3>
+          <p class="field"><span class="label">District:</span><span class="value">${formData.district}</span></p>
+          <p class="field"><span class="label">Police Station:</span><span class="value">${formData.policeStation}</span></p>
+          <p class="field"><span class="label">Year:</span><span class="value">${formData.year}</span></p>
+          <p class="field"><span class="label">F.I.R. No:</span><span class="value">${formData.firNo}</span></p>
+          <p class="field"><span class="label">Date:</span><span class="value">${formData.date}</span></p>
+        </div>
+
+        <div class="section">
+          <h3>Offence Details</h3>
+          <p class="field"><span class="label">Offence Date:</span><span class="value">${formData.offenceDate}</span></p>
+          <p class="field"><span class="label">Offence Time:</span><span class="value">${formData.offenceTime}</span></p>
+          <p class="field"><span class="label">Address:</span><span class="value">${formData.address}</span></p>
+        </div>
+
+        <div class="section">
+          <h3>Complainant Details</h3>
+          <p class="field"><span class="label">Name:</span><span class="value">${formData.complainantName}</span></p>
+          <p class="field"><span class="label">Father's/Husband's Name:</span><span class="value">${formData.fatherName}</span></p>
+          <p class="field"><span class="label">Date of Birth:</span><span class="value">${formData.birthDate}</span></p>
+          <p class="field"><span class="label">Nationality:</span><span class="value">${formData.nationality}</span></p>
+          <p class="field"><span class="label">Occupation:</span><span class="value">${formData.occupation}</span></p>
+          <p class="field"><span class="label">Address:</span><span class="value">${formData.complainantAddress}</span></p>
+        </div>
       </body>
       </html>
     `;
@@ -131,183 +180,234 @@ const FormToPDF = () => {
       };
 
       const file = await RNHTMLtoPDF.convert(options);
-      alert(`PDF saved at: ${file.filePath}`);
-      navigation.navigate('ViewPDF', { filePath: file.filePath });
+      Alert.alert(
+        'PDF Generated Successfully',
+        'Your FIR report has been generated and saved.',
+        [
+          { text: 'View PDF', onPress: () => (navigation as any).navigate('ViewPDF', { filePath: file.filePath }) },
+          { text: 'OK' }
+        ]
+      );
     } catch (error) {
       console.error('Error generating PDF:', error);
+      Alert.alert('Error', 'Failed to generate PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
     }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.screenContainer}>
-        <Text style={styles.title}>Official FIR Format</Text>
-        <Text style={styles.infoText}>
-          Below is the official FIR format. You can download it for your use.
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header Section */}
+      <FIRHeader
+        title="FIR Management"
+        subtitle="Download official formats and generate custom reports"
+      />
+
+      {/* Download Section */}
+      <DownloadSection
+        isDownloading={isDownloading}
+        onDownload={downloadDocx}
+      />
+
+      {/* Form Section */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Generate Custom FIR Report</Text>
+        </View>
+        <Text style={styles.sectionDescription}>
+          Fill in the details below to generate a customized FIR report in PDF format.
         </Text>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={downloadDocx}
-          disabled={isDownloading} // Disable button while downloading
-        >
-          <Text style={styles.buttonText}>
-            {isDownloading ? 'Downloading...' : 'Download FIR Format'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.title}>Generate FIR PDF</Text>
+        {/* FIR Details Card */}
+        <FIRDetailsCard
+          formData={{
+            district: formData.district,
+            policeStation: formData.policeStation,
+            year: formData.year,
+            firNo: formData.firNo,
+            date: formData.date,
+          }}
+          onChange={handleChange}
+        />
 
-      <View style={styles.section}>
+        {/* Offence Details Card */}
+        <OffenceDetailsCard
+          formData={{
+            offenceDate: formData.offenceDate,
+            offenceTime: formData.offenceTime,
+            address: formData.address,
+          }}
+          onChange={handleChange}
+        />
 
+        {/* Complainant Details Card */}
+        <ComplainantDetailsCard
+          formData={{
+            complainantName: formData.complainantName,
+            fatherName: formData.fatherName,
+            birthDate: formData.birthDate,
+            nationality: formData.nationality,
+            occupation: formData.occupation,
+            complainantAddress: formData.complainantAddress,
+          }}
+          onChange={handleChange}
+        />
 
-        <Text style={styles.label}>Address:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Address"
-          value={formData.address}
-          onChangeText={(value) => handleChange('address', value)}
+        {/* Generate PDF Button */}
+        <FormButton
+          title="Generate FIR PDF"
+          loadingTitle="Generating PDF..."
+          isLoading={isGeneratingPDF}
+          onPress={generatePDF}
+          iconName="document"
+          backgroundColor="#059669"
         />
       </View>
-
-      {/* Section 6 */}
-      <Text style={styles.label}>Complainant Name:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Complainant Name"
-        value={formData.complainantName}
-        onChangeText={(value) => handleChange('complainantName', value)}
-      />
-
-      <Text style={styles.label}>Father's / Husband's Name:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Father's / Husband's Name"
-        value={formData.fatherName}
-        onChangeText={(value) => handleChange('fatherName', value)}
-      />
-
-      <Text style={styles.label}>Date / Year of Birth:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Date / Year of Birth"
-        value={formData.birthDate}
-        onChangeText={(value) => handleChange('birthDate', value)}
-      />
-
-      <Text style={styles.label}>Nationality:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nationality"
-        value={formData.nationality}
-        onChangeText={(value) => handleChange('nationality', value)}
-      />
-
-      <Text style={styles.label}>Occupation:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Occupation"
-        value={formData.occupation}
-        onChangeText={(value) => handleChange('occupation', value)}
-      />
-
-      <Text style={styles.label}>Address:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Address"
-        value={formData.complainantAddress}
-        onChangeText={(value) => handleChange('complainantAddress', value)}
-      />
-
-      {/* Add other fields similarly */}
-      <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
-
-        <Button title="Generate PDF" onPress={generatePDF} />
-      </ScrollView>
-
-
-
     </ScrollView>
-
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
-  input: { borderBottomWidth: 1, marginBottom: 15, paddingVertical: 5, fontSize: 16 },
-  screenContainer: {
+  container: {
     flex: 1,
-    backgroundColor: '#f4f4f4',
-    padding: 20,
-    marginBottom: 40
+    backgroundColor: '#f8fafc',
   },
-  title: {
-    fontSize: 24,
+  header: {
+    backgroundColor: '#1e3a8a',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  headerContent: {
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#1e3a8a',
-    marginBottom: 15,
+    color: '#fff',
+    marginTop: 10,
+    marginBottom: 5,
   },
-  inputField: {
-    backgroundColor: '#fff',
-    padding: 10,
+  headerSubtitle: {
     fontSize: 16,
-    borderRadius: 8,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    marginBottom: 20,
-  },
-  loadingIndicator: {
-    marginTop: 20,
-  },
-  errorMessage: {
-    color: '#ff0000',
-    fontSize: 16,
+    color: '#e0e7ff',
     textAlign: 'center',
-    marginTop: 20,
+    lineHeight: 22,
   },
-  documentItem: {
-    backgroundColor: '#fff',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+  section: {
+    margin: 20,
+    marginBottom: 10,
+  },
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 8,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginLeft: 10,
+  },
+  sectionDescription: {
+    fontSize: 14,
+    color: '#64748b',
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginLeft: 8,
+  },
+  row: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  documentInfo: {
+  inputGroup: {
     flex: 1,
+    marginRight: 8,
   },
-  documentTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e3a8a',
-  },
-  documentDescription: {
+  inputLabel: {
     fontSize: 14,
-    color: '#555',
-    marginTop: 5,
-
-    marginBottom: 15,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 6,
   },
-  button: {
-    marginTop: 15,
-    backgroundColor: '#2563EB',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+  input: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
     borderRadius: 8,
-
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    backgroundColor: '#fff',
+    color: '#1f2937',
   },
-  buttonText: {
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  primaryButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginTop: 10,
+  },
+  secondaryButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginTop: 10,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    backgroundColor: '#2563eb',
+  },
+  buttonContentSecondary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    backgroundColor: '#059669',
+  },
+  buttonContentDisabled: {
+    backgroundColor: '#9ca3af',
+  },
+  primaryButtonText: {
     color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  }
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
 });
 
 export default FormToPDF;
