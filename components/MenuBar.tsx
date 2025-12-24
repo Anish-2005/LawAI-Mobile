@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; 
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const MenuBar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [name, setName] = useState('');
-  const [badgeNumber, setBadgeNumber] = useState('');
+type MenuBarNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-  const navigation = useNavigation(); 
-  const slideAnim = useRef(new Animated.Value(-250)).current;  // Slide animation for the menu
+const MenuBar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [name, setName] = useState<string>('');
+  const [badgeNumber, setBadgeNumber] = useState<string>('');
+
+  const navigation = useNavigation<MenuBarNavigationProp>(); 
+  const slideAnim = useRef<Animated.Value>(new Animated.Value(-250)).current;  // Slide animation for the menu
 
   // Fetch user data from AsyncStorage
   useEffect(() => {

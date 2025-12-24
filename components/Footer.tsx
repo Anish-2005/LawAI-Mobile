@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Linking, StyleSheet } from 'react-native';
 
-const Footer = () => {
+const Footer: React.FC = () => {
   return (
     <View style={styles.footerContainer}>
       <View style={styles.footerContent}>

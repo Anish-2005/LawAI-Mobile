@@ -13,17 +13,31 @@ import {
 import SpeechToText from 'react-native-voice';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const Query = () => {
-  const [query, setQuery] = useState('');
-  const [response, setResponse] = useState('Response will appear here...');
-  const [isListening, setIsListening] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeSection, setActiveSection] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [error, setError] = useState('');
+interface CaseDetails {
+  caseHeading: string;
+  userQuery: string;
+  tags: string;
+  description: string;
+  caseStatus: string;
+}
 
-  const [caseDetails, setCaseDetails] = useState({
+interface ResponseData {
+  acts?: Record<string, string>;
+  description?: string;
+  [key: string]: any;
+}
+
+const Query: React.FC = () => {
+  const [query, setQuery] = useState<string>('');
+  const [response, setResponse] = useState<ResponseData | string>('Response will appear here...');
+  const [isListening, setIsListening] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+
+  const [caseDetails, setCaseDetails] = useState<CaseDetails>({
     caseHeading: '',
     userQuery: '',
     tags: '',
@@ -31,11 +45,11 @@ const Query = () => {
     caseStatus: 'closed',
   });
 
-  const toggleDescription = (section) => {
+  const toggleDescription = (section: string): void => {
     setActiveSection(activeSection === section ? null : section);
   };
 
-  const handleMicClick = async () => {
+  const handleMicClick = async (): Promise<void> => {
     try {
       if (isListening) {
         await SpeechToText.stopListening();
@@ -49,7 +63,7 @@ const Query = () => {
     }
   };
 
-  const handleQuerySubmit = async () => {
+  const handleQuerySubmit = async (): Promise<void> => {
     setIsLoading(true);
     setError('');
 
@@ -63,7 +77,7 @@ const Query = () => {
         }
       );
 
-      const data = await response.json();
+      const data: ResponseData = await response.json();
       setResponse(data);
 
       setCaseDetails({
@@ -83,7 +97,7 @@ const Query = () => {
     setIsLoading(false);
   };
 
-  const renderResponse = (data) => {
+  const renderResponse = (data: ResponseData | string): JSX.Element => {
     if (!data) {
       return <Text style={styles.placeholder}>No response available</Text>;
     }
@@ -129,7 +143,7 @@ const Query = () => {
     );
   };
 
-  const handleSaveCase = async () => {
+  const handleSaveCase = async (): Promise<void> => {
     const payload = {
       cases: [
         {

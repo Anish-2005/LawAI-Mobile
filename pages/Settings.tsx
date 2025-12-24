@@ -2,35 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Switch, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { Ionicons, FontAwesome, MaterialIcons, Feather } from 'react-native-vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
 
-const Settings = () => {
-  const [notifications, setNotifications] = useState(true);
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-  const [sessionTimeout, setSessionTimeout] = useState(15);
-  const [highContrast, setHighContrast] = useState(false);
-  const [activityLog, setActivityLog] = useState([
+type SettingsNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
+
+interface ActivityLogItem {
+  action: string;
+  time: string;
+}
+
+const Settings: React.FC = () => {
+  const [notifications, setNotifications] = useState<boolean>(true);
+  const [is2FAEnabled, setIs2FAEnabled] = useState<boolean>(false);
+  const [sessionTimeout, setSessionTimeout] = useState<number>(15);
+  const [highContrast, setHighContrast] = useState<boolean>(false);
+  const [activityLog, setActivityLog] = useState<ActivityLogItem[]>([
     { action: 'Login', time: '2024-11-25 10:30 AM' },
     { action: 'Changed Password', time: '2024-11-20 02:00 PM' },
     { action: 'Enabled 2FA', time: '2024-11-18 08:45 AM' },
     { action: 'Logged Out', time: '2024-11-17 04:10 PM' },
   ]);
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<SettingsNavigationProp>();
 
-  const handleNotificationsChange = () => {
+  const handleNotificationsChange = (): void => {
     setNotifications(!notifications);
   };
 
-  const handle2FAChange = () => {
+  const handle2FAChange = (): void => {
     setIs2FAEnabled(!is2FAEnabled);
   };
 
-  const handleHighContrastChange = () => {
+  const handleHighContrastChange = (): void => {
     setHighContrast(!highContrast);
   };
 
-  const handleSessionTimeoutChange = (value) => {
-    setSessionTimeout(value);
+  const handleSessionTimeoutChange = (value: string): void => {
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue)) {
+      setSessionTimeout(numValue);
+    }
   };
 
   return (

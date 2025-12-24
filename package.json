@@ -2,7 +2,7 @@
   "name": "lawai",
   "license": "0BSD",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "start": "expo start --dev-client",
     "android": "expo run:android",

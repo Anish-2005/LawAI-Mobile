@@ -1,4 +1,13 @@
 {
-  "compilerOptions": {},
-  "extends": "expo/tsconfig.base"
+  "compilerOptions": {
+    "skipLibCheck": true
+  },
+  "extends": "expo/tsconfig.base",
+  "exclude": [
+    "**/*.json"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }
