@@ -31,7 +31,7 @@ const Contact = () => {
         </Text>
         <View style={styles.contactDetails}>
           <View style={styles.contactItem}>
-            <Icon name="envelope" size={20} color="#3b82f6" />
+            <Icon name="email" size={20} color="#3b82f6" />
             <Text style={styles.contactText}>code.a.cola.01@gmail.com</Text>
           </View>
           <View style={styles.contactItem}>
@@ -39,7 +39,7 @@ const Contact = () => {
             <Text style={styles.contactText}>+91-123-456-7890</Text>
           </View>
           <View style={styles.contactItem}>
-            <Icon name="map-marker" size={20} color="#3b82f6" />
+            <Icon name="location-on" size={20} color="#3b82f6" />
             <Text style={styles.contactText}>Ministry of Law & Justice, Madhya Pradesh, India</Text>
           </View>
         </View>

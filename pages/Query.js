@@ -10,17 +10,19 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import SpeechToText from 'react-native-voice'; // Import SpeechToText
+import SpeechToText from 'react-native-voice';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Query = () => {
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState('Response will appear here...');
   const [isListening, setIsListening] = useState(false);
-  const [showDescriptions, setShowDescriptions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [error, setError] = useState('');
+
   const [caseDetails, setCaseDetails] = useState({
     caseHeading: '',
     userQuery: '',
@@ -28,36 +30,23 @@ const Query = () => {
     description: '',
     caseStatus: 'closed',
   });
-  const [showPopup, setShowPopup] = useState(false);
-  const [error, setError] = useState('');
 
   const toggleDescription = (section) => {
-    if (activeSection === section) {
-      setActiveSection(null); // Collapse if the same section is clicked
-    } else {
-      setActiveSection(section); // Expand the clicked section
-    }
+    setActiveSection(activeSection === section ? null : section);
   };
 
   const handleMicClick = async () => {
     try {
       if (isListening) {
         await SpeechToText.stopListening();
-        console.log('Speech recognition stopped');
         setIsListening(false);
       } else {
         await SpeechToText.startListening();
-        console.log('Speech recognition started');
         setIsListening(true);
       }
     } catch (error) {
-      console.error('Error in handling mic click:', error);
       setIsListening(false);
     }
-  };
-
-  const handleInputChange = (text) => {
-    setQuery(text);
   };
 
   const handleQuerySubmit = async () => {
@@ -65,14 +54,18 @@ const Query = () => {
     setError('');
 
     try {
-      const response = await fetch('https://sih-backend-881i.onrender.com/encode/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
+      const response = await fetch(
+        'https://sih-backend-881i.onrender.com/encode/',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query }),
+        }
+      );
 
       const data = await response.json();
       setResponse(data);
+
       setCaseDetails({
         caseHeading: 'New Case Identified',
         userQuery: query,
@@ -80,10 +73,10 @@ const Query = () => {
         description: data.description || 'Detailed case description here.',
         caseStatus: 'under investigation',
       });
+
       setShowPopup(true);
-    } catch (error) {
-      console.error('Error fetching the response:', error);
-      setError('Error occurred while fetching the response');
+    } catch (err) {
+      setError('Something went wrong while fetching the response.');
       setResponse('');
     }
 
@@ -92,33 +85,48 @@ const Query = () => {
 
   const renderResponse = (data) => {
     if (!data) {
-      return <Text style={styles.responseText}>No data available</Text>;
+      return <Text style={styles.placeholder}>No response available</Text>;
     }
 
-    if (typeof data === 'object' && typeof data.acts === 'object') {
+    if (typeof data === 'object' && data.acts) {
       return (
-        <View>
-          <Text style={styles.responseTitle}>Act: IPC</Text>
-          <ScrollView style={styles.scrollView}>
-            {Object.entries(data.acts).map(([section, description], index) => (
-              <View key={index} style={styles.sectionContainer}>
-                <Text style={styles.responseText}>Section {section}</Text>
-                <TouchableOpacity onPress={() => toggleDescription(section)}>
-                  <Text style={styles.linkText}>
-                    {activeSection === section ? 'Hide Description' : 'Show Description'}
-                  </Text>
+        <>
+          <Text style={styles.responseHeader}>Applicable Acts (IPC)</Text>
+          {Object.entries(data.acts).map(([section, description], index) => (
+            <View key={index} style={styles.sectionCard}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Section {section}</Text>
+                <TouchableOpacity
+                  onPress={() => toggleDescription(section)}
+                >
+                  <Icon
+                    name={
+                      activeSection === section
+                        ? 'chevron-up'
+                        : 'chevron-down'
+                    }
+                    size={16}
+                    color="#2563EB"
+                  />
                 </TouchableOpacity>
-                {activeSection === section && (
-                  <Text style={styles.descriptionText}>{description}</Text>
-                )}
               </View>
-            ))}
-          </ScrollView>
-        </View>
+
+              {activeSection === section && (
+                <Text style={styles.sectionDescription}>
+                  {description}
+                </Text>
+              )}
+            </View>
+          ))}
+        </>
       );
     }
 
-    return <Text style={styles.responseText}>{JSON.stringify(data, null, 2)}</Text>;
+    return (
+      <Text style={styles.responseRaw}>
+        {JSON.stringify(data, null, 2)}
+      </Text>
+    );
   };
 
   const handleSaveCase = async () => {
@@ -133,138 +141,132 @@ const Query = () => {
     };
 
     try {
-      const response = await fetch('https://sih-backend-881i.onrender.com/case_save/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      Alert.alert('Success', 'Case saved successfully!');
+      await fetch(
+        'https://sih-backend-881i.onrender.com/case_save/',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      Alert.alert('Success', 'Case saved successfully');
       setModalVisible(false);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to save case.');
+    } catch {
+      Alert.alert('Error', 'Failed to save case');
     }
-  };
-
-  const handlePopupClick = () => {
-    setShowPopup(false);
-    setModalVisible(true);
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <View style={styles.responseContainer}>
-          <View style={styles.responseBox}>
-            {isLoading ? (
-              <ActivityIndicator size="large" color="#007bff" />
-            ) : error ? (
-              <Text style={styles.errorText}>{error}</Text>
-            ) : (
-              renderResponse(response)
-            )}
-          </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* RESPONSE */}
+        <View style={styles.responseBox}>
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#2563EB" />
+          ) : error ? (
+            <Text style={styles.errorText}>{error}</Text>
+          ) : (
+            renderResponse(response)
+          )}
         </View>
 
-        <View style={styles.inputContainer}>
+        {/* INPUT */}
+        <View style={styles.inputWrapper}>
           <TextInput
             style={styles.input}
+            placeholder="Ask your legal query…"
+            placeholderTextColor="#94A3B8"
             value={query}
-            onChangeText={handleInputChange}
-            placeholder="Type your query here..."
-            placeholderTextColor="#ccc"
+            onChangeText={setQuery}
+            multiline
           />
+
           <TouchableOpacity
+            style={[
+              styles.micButton,
+              isListening && styles.micActive,
+            ]}
             onPress={handleMicClick}
-            style={styles.micButton}
           >
             <Icon
               name="microphone"
-              size={24}
-              color={isListening ? '#007bff' : '#555'}
+              size={20}
+              color={isListening ? '#fff' : '#2563EB'}
             />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={handleQuerySubmit} style={styles.submitButton}>
-          <Text style={styles.submitButtonText}>Submit Query</Text>
+        {/* SUBMIT */}
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={handleQuerySubmit}
+        >
+          <Text style={styles.submitText}>Analyze Query</Text>
         </TouchableOpacity>
 
+        {/* POPUP */}
         {showPopup && (
-          <TouchableOpacity style={styles.popup} onPress={handlePopupClick}>
-            <Text style={styles.popupText}>New Case Identified</Text>
+          <TouchableOpacity
+            style={styles.casePopup}
+            onPress={() => {
+              setShowPopup(false);
+              setModalVisible(true);
+            }}
+          >
+            <Icon name="gavel" size={16} color="#fff" />
+            <Text style={styles.popupText}>
+              New Case Identified — Tap to Review
+            </Text>
           </TouchableOpacity>
         )}
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
+        {/* MODAL */}
+        <Modal visible={modalVisible} transparent animationType="slide">
           <View style={styles.modalOverlay}>
-  <View style={styles.modalContent}>
-    <Text style={styles.modalTitle}>Edit Case Details</Text>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Case Details</Text>
 
-    <Text style={styles.modalLabel}>Case Heading:</Text>
-    <TextInput
-      style={styles.modalInput}
-      value={caseDetails.caseHeading}
-      onChangeText={(text) =>
-        setCaseDetails({ ...caseDetails, caseHeading: text })
-      }
-    />
+              {[
+                ['Case Heading', 'caseHeading'],
+                ['User Query', 'userQuery'],
+                ['Tags', 'tags'],
+                ['Description', 'description'],
+                ['Case Status', 'caseStatus'],
+              ].map(([label, key]) => (
+                <View key={key}>
+                  <Text style={styles.modalLabel}>{label}</Text>
+                  <TextInput
+                    style={[
+                      styles.modalInput,
+                      key === 'description' && { height: 90 },
+                    ]}
+                    multiline={key === 'description'}
+                    value={caseDetails[key]}
+                    onChangeText={(text) =>
+                      setCaseDetails({
+                        ...caseDetails,
+                        [key]: text,
+                      })
+                    }
+                  />
+                </View>
+              ))}
 
-    <Text style={styles.modalLabel}>User Query:</Text>
-    <TextInput
-      style={styles.modalInput}
-      value={caseDetails.userQuery}
-      onChangeText={(text) =>
-        setCaseDetails({ ...caseDetails, userQuery: text })
-      }
-    />
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSaveCase}
+              >
+                <Text style={styles.saveText}>Save Case</Text>
+              </TouchableOpacity>
 
-    <Text style={styles.modalLabel}>Tags:</Text>
-    <TextInput
-      style={styles.modalInput}
-      value={caseDetails.tags}
-      onChangeText={(text) =>
-        setCaseDetails({ ...caseDetails, tags: text })
-      }
-    />
-
-    <Text style={styles.modalLabel}>Description:</Text>
-    <TextInput
-      style={[styles.modalInput, { height: 80 }]}
-      multiline
-      value={caseDetails.description}
-      onChangeText={(text) =>
-        setCaseDetails({ ...caseDetails, description: text })
-      }
-    />
-
-    <Text style={styles.modalLabel}>Case Status:</Text>
-    <TextInput
-      style={styles.modalInput}
-      value={caseDetails.caseStatus}
-      onChangeText={(text) =>
-        setCaseDetails({ ...caseDetails, caseStatus: text })
-      }
-    />
-
-    <TouchableOpacity style={styles.saveButton} onPress={handleSaveCase}>
-      <Text style={styles.saveButtonText}>Save Case</Text>
-    </TouchableOpacity>
-
-    <TouchableOpacity
-      style={styles.closeButton}
-      onPress={() => setModalVisible(false)}
-    >
-      <Text style={styles.closeButtonText}>Close</Text>
-    </TouchableOpacity>
-  </View>
-</View>
-
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </Modal>
       </ScrollView>
     </View>
@@ -274,144 +276,185 @@ const Query = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8FAFC',
+    padding: 16,
   },
+
   responseBox: {
-    flex: 1,
-    marginBottom: 20,
-    padding: 15,
-    borderRadius: 10,
     backgroundColor: '#fff',
-    elevation: 3,
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
   },
-  responseText: {
-    fontSize: 16,
-    color: '#333',
+
+  responseHeader: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginBottom: 12,
   },
-  errorText: {
-    fontSize: 16,
-    color: '#ff4d4f',
+
+  sectionCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    padding: 14,
+    marginBottom: 12,
+    backgroundColor: '#F9FAFB',
   },
-  inputContainer: {
+
+  sectionHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
   },
+
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1E40AF',
+  },
+
+  sectionDescription: {
+    marginTop: 10,
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#334155',
+  },
+
+  inputWrapper: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+
   input: {
     flex: 1,
-    fontSize: 16,
-    color: '#333',
+    fontSize: 15,
+    color: '#0F172A',
+    maxHeight: 120,
   },
+
   micButton: {
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: '#EFF6FF',
     marginLeft: 10,
   },
+
+  micActive: {
+    backgroundColor: '#2563EB',
+  },
+
   submitButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 15,
-    borderRadius: 10,
+    backgroundColor: '#2563EB',
+    paddingVertical: 16,
+    borderRadius: 14,
     alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    marginBottom: 20,
   },
-  submitButtonText: {
-    fontSize: 18,
+
+  submitText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
   },
-  popup: {
-    backgroundColor: '#ffc107',
-    padding: 10,
-    borderRadius: 5,
+
+  casePopup: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 20,
+    justifyContent: 'center',
+    backgroundColor: '#16A34A',
+    padding: 14,
+    borderRadius: 12,
+    gap: 8,
   },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 14,
-    marginTop: 5,
-    marginBottom: 10,
-    backgroundColor: '#f9f9f9',
-  },
+
   popupText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
+
   modalOverlay: {
     flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 16,
   },
+
   modalContent: {
-    width: '90%',
     backgroundColor: '#fff',
+    borderRadius: 18,
     padding: 20,
-    borderRadius: 10,
   },
+
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '800',
     marginBottom: 10,
   },
+
   modalLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  modalText: {
     fontSize: 14,
-    marginBottom: 10,
-  },
-  saveButton: {
-    backgroundColor: '#28a745',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  closeButton: {
-    backgroundColor: '#dc3545',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
+    fontWeight: '600',
     marginTop: 10,
+    color: '#334155',
   },
-  closeButtonText: {
+
+  modalInput: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 10,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginTop: 6,
+  },
+
+  saveButton: {
+    backgroundColor: '#16A34A',
+    padding: 14,
+    borderRadius: 12,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+
+  saveText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
-  sectionContainer: {
-    marginBottom: 16,
+
+  closeButton: {
+    alignItems: 'center',
+    marginTop: 12,
   },
-  scrollView: {
-    margin: 10,
+
+  closeText: {
+    color: '#DC2626',
+    fontWeight: '600',
+  },
+
+  errorText: {
+    color: '#DC2626',
+    fontSize: 15,
+  },
+
+  placeholder: {
+    color: '#94A3B8',
+  },
+
+  responseRaw: {
+    fontFamily: 'monospace',
+    fontSize: 13,
+    color: '#334155',
   },
 });
 
