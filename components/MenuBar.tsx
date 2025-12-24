@@ -67,11 +67,18 @@ const MenuBar = () => {
 
       {/* Animated side menu */}
       {isMenuOpen && (
-        <Animated.View style={[styles.menu, { transform: [{ translateX: slideAnim }] }]}>
-          <View style={styles.menuHeader}>
-            <Text style={styles.menuTitle}>LawAI</Text>
-            <Ionicons name="book" size={32} color="white" />
-          </View>
+        <>
+          <TouchableOpacity style={styles.overlay} onPress={closeMenu} activeOpacity={1} />
+          <Animated.View style={[styles.menu, { transform: [{ translateX: slideAnim }] }]}>
+            <View style={styles.menuHeader}>
+              <View style={styles.headerContent}>
+                <Ionicons name="book" size={32} color="#fff" />
+                <Text style={styles.menuTitle}>LawAI</Text>
+              </View>
+              <TouchableOpacity onPress={closeMenu} style={styles.closeIconButton}>
+                <Ionicons name="close" size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
 
           {/* Show user info if logged in */}
           {isLoggedIn && (
@@ -107,12 +114,9 @@ const MenuBar = () => {
             <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.menuItem}>
               <Text style={styles.menuText}>Settings</Text>
             </TouchableOpacity>
-            {/* Close button */}
-            <TouchableOpacity onPress={closeMenu} style={styles.closeButton}>
-              <Text style={styles.closeText}>Close</Text>
-            </TouchableOpacity>
           </View>
         </Animated.View>
+        </>
       )}
     </View>
   );
@@ -127,31 +131,57 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 40,
     left: 20,
-    zIndex: 1000, // Ensures the menu button is above everything else
+    zIndex: 1000,
+  },
+  menuButtonContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   menu: {
     position: 'absolute',
     top: 0,
     left: 0,
-    width: 250,
+    width: 280,
     height: '100%',
-    backgroundColor: '#3b82f6', // Blue color for background
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-    elevation: 10, // For Android shadow
-    zIndex: 9999, // Ensure the menu floats over other elements
-    display: 'flex', // This ensures the menu content is still flexibly arranged
-    padding: 20, // Keep padding so menu items inside it are not cramped
+    backgroundColor: '#1e3a8a',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
+    zIndex: 9999,
+    paddingTop: 50,
   },
   menuHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   menuTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#fff',
+    marginLeft: 12,
+  },
+  closeIconButton: {
+    padding: 8,
   },
   userInfo: {
     flexDirection: 'row',
@@ -184,16 +214,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'white',
   },
-  closeButton: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: '#e63946',
-    borderRadius: 5,
-  },
-  closeText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 16,
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 999,
   },
 });
 
