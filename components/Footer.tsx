@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Linking, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const Footer: React.FC = () => {
   return (
@@ -34,7 +35,7 @@ const Footer: React.FC = () => {
       {/* Footer Bottom Section */}
       <View style={styles.footerBottom}>
         <Text style={styles.bottomText}>
-          Made with ❤️ by{' '}
+          Made with <Ionicons name="heart" size={14} color="#DC2626" /> by{' '}
           <TouchableOpacity onPress={() => Linking.openURL('https://your-team-link.com')}>
             <Text style={styles.linkText}>CODE-A-COLA</Text>
           </TouchableOpacity>{' '}

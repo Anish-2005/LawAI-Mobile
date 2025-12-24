@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, Alert, Text } from 'react-native';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import { Ionicons } from '@expo/vector-icons';
 import { Buffer } from 'buffer';
 import OriginalDocumentsHeader from '../components/OriginalDocuments/OriginalDocumentsHeader';
 import SearchBar from '../components/OriginalDocuments/SearchBar';
@@ -126,6 +127,7 @@ const OriginalDocuments = () => {
   const [filteredPdfs, setFilteredPdfs] = useState<PdfItem[]>([]);
   const [pdfSearchQuery, setPdfSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [downloadingIds, setDownloadingIds] = useState<Set<number>>(new Set());
 
 
@@ -186,6 +188,7 @@ const OriginalDocuments = () => {
         { responseType: 'arraybuffer' }
       );
 
+      // Convert arraybuffer to base64 using Buffer
       const base64Data = Buffer.from(response.data, 'binary').toString('base64');
       const fileUri = `${(FileSystem as any).cacheDirectory}Document_${pdfId}.pdf`;
 
@@ -218,7 +221,8 @@ const OriginalDocuments = () => {
 
       {pdfs === dummyPdfData && (
         <View style={styles.offlineBanner}>
-          <Text style={styles.offlineText}>📋 Using sample documents - Server temporarily unavailable</Text>
+          <Ionicons name="information-circle" size={16} color="#F59E0B" />
+          <Text style={styles.offlineText}> Using sample documents - Server temporarily unavailable</Text>
         </View>
       )}
 
@@ -263,6 +267,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#F59E0B',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   offlineText: {
     color: '#92400E',

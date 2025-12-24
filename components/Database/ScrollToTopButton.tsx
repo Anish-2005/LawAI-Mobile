@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ScrollToTopButtonProps {
   visible: boolean;
@@ -11,7 +12,7 @@ const ScrollToTopButton: React.FC<ScrollToTopButtonProps> = ({ visible, onPress 
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.button} activeOpacity={0.8}>
-      <Text style={styles.buttonText}>↑</Text>
+      <Ionicons name="chevron-up" size={24} color="white" />
     </TouchableOpacity>
   );
 };
@@ -32,11 +33,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
     elevation: 5,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
   },
 });
 

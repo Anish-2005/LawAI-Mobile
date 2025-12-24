@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ErrorStateProps {
   message?: string;
@@ -15,7 +16,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.icon}>⚠️</Text>
+        <Ionicons name="warning" size={48} color="#DC2626" />
         <Text style={styles.message}>{message}</Text>
         {onRetry && (
           <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
@@ -37,10 +38,6 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
-  },
-  icon: {
-    fontSize: 48,
-    marginBottom: 16,
   },
   message: {
     fontSize: 16,

@@ -1,21 +1,22 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface EmptyStateProps {
   message?: string;
   subMessage?: string;
-  icon?: string;
+  iconName?: keyof typeof Ionicons.glyphMap;
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({
   message = "No documents found",
   subMessage = "Try adjusting your search criteria or check back later.",
-  icon = "📂"
+  iconName = "folder"
 }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.icon}>{icon}</Text>
+        <Ionicons name={iconName} size={48} color="#6B7280" />
         <Text style={styles.message}>{message}</Text>
         <Text style={styles.subMessage}>{subMessage}</Text>
       </View>
@@ -33,10 +34,6 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
-  },
-  icon: {
-    fontSize: 48,
-    marginBottom: 16,
   },
   message: {
     fontSize: 20,

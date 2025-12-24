@@ -12,7 +12,7 @@ interface OriginalDocumentsHeaderProps {
 const OriginalDocumentsHeader: React.FC<OriginalDocumentsHeaderProps> = ({
   title,
   subtitle,
-  iconName = "document-text",
+  iconName = "document",
   iconColor = '#1e3a8a'
 }) => {
   return (

@@ -70,7 +70,7 @@ const MenuBar = () => {
         <Animated.View style={[styles.menu, { transform: [{ translateX: slideAnim }] }]}>
           <View style={styles.menuHeader}>
             <Text style={styles.menuTitle}>LawAI</Text>
-            <Ionicons name="gavel" size={32} color="white" />
+            <Ionicons name="book" size={32} color="white" />
           </View>
 
           {/* Show user info if logged in */}

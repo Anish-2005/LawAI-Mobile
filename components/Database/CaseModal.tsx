@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, Modal, ScrollView, TouchableOpacity, Button, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import TagList from './TagList';
 import StatusBadge from './StatusBadge';
 
@@ -61,7 +62,7 @@ const CaseModal: React.FC<CaseModalProps> = ({
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>×</Text>
+            <Ionicons name="close" size={24} color="#6B7280" />
           </TouchableOpacity>
 
           <ScrollView showsVerticalScrollIndicator={false}>
@@ -194,11 +195,6 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 1,
-  },
-  closeButtonText: {
-    fontSize: 24,
-    color: '#6B7280',
-    fontWeight: 'bold',
   },
   header: {
     flexDirection: 'row',

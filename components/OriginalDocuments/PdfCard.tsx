@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface PdfItem {
   id: number;
@@ -18,7 +19,7 @@ const PdfCard: React.FC<PdfCardProps> = ({ pdf, onDownload, isDownloading = fals
     <View style={styles.card}>
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>📄</Text>
+          <Ionicons name="document" size={20} color="#1e3a8a" />
         </View>
         <View style={styles.info}>
           <Text style={styles.title} numberOfLines={2}>
@@ -70,9 +71,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
-  },
-  icon: {
-    fontSize: 20,
   },
   info: {
     flex: 1,

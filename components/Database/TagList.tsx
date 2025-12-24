@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface TagListProps {
   tags?: string;
@@ -25,7 +26,7 @@ const TagList: React.FC<TagListProps> = ({ tags, editable = false, onRemoveTag }
           <Text style={styles.tagText}>{tag}</Text>
           {editable && onRemoveTag && (
             <TouchableOpacity onPress={() => onRemoveTag(index)} style={styles.removeButton}>
-              <Text style={styles.removeText}>×</Text>
+              <Ionicons name="close" size={12} color="#6B7280" />
             </TouchableOpacity>
           )}
         </View>
@@ -58,11 +59,6 @@ const styles = StyleSheet.create({
   removeButton: {
     marginLeft: 8,
     paddingHorizontal: 4,
-  },
-  removeText: {
-    color: '#EF4444',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   noTagsText: {
     color: '#6B7280',

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface EmptyStateProps {
   message?: string;
@@ -13,7 +14,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.icon}>📋</Text>
+        <Ionicons name="document-text-outline" size={48} color="#6B7280" />
         <Text style={styles.message}>{message}</Text>
         <Text style={styles.subMessage}>{subMessage}</Text>
       </View>
@@ -31,10 +32,6 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
     paddingHorizontal: 20,
-  },
-  icon: {
-    fontSize: 48,
-    marginBottom: 16,
   },
   message: {
     fontSize: 20,
