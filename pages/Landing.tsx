@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text,TextInput, ScrollView, Image, TouchableOpacity, StyleSheet, Linking } from 'react-native';
+import { View, Text, TextInput, ScrollView, Image, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+type LandingNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+
 const Landing = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<LandingNavigationProp>();
   const [showButton, setShowButton] = useState(false);
-  const scrollViewRef = useRef(null); // Use useRef here to reference ScrollView
+  const scrollViewRef = useRef<ScrollView>(null); // Use useRef here to reference ScrollView
 
   const handleDownload = () => {
     navigation.navigate('Download');
   };
 
-  const handleScroll = (event) => {
+  const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
     setShowButton(offsetY > 300); // Show the back-to-top button after scrolling 300px
   };
@@ -21,26 +25,26 @@ const Landing = () => {
     scrollViewRef.current?.scrollTo({ y: 0, animated: true }); // Use scrollViewRef correctly
   };
 
-  const handleSmoothScroll = (target) => {
+  const handleSmoothScroll = (target: number) => {
     scrollViewRef.current?.scrollTo({ y: target, animated: true }); // Use scrollViewRef correctly
   };
   
-    const [formData, setFormData] = useState({
-      name: '',
-      email: '',
-      message: '',
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+  
+  const handleInputChange = (name: string, value: string) => {
+    setFormData({
+      ...formData,
+      [name]: value,
     });
+  };
   
-    const handleInputChange = (name, value) => {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    };
-  
-    const handleSubmit = () => {
-      console.log('Form submitted:', formData);
-    };
+  const handleSubmit = () => {
+    console.log('Form submitted:', formData);
+  };
   return (
     <ScrollView
       style={styles.container}
