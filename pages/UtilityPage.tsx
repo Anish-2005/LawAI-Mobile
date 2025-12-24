@@ -1,112 +1,96 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import Icon from '@expo/vector-icons/FontAwesome';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import UtilityHeader from '../components/UtilityPage/UtilityHeader';
+import UtilityCard from '../components/UtilityPage/UtilityCard';
 
 const UtilityPage = ({ isLoggedIn }) => {
   const navigation = useNavigation<any>();
 
   const menuItems = [
-    { name: 'AI Lawyer', icon: 'gavel', description: 'Ask legal queries and get answers from our AI lawyer.', screen: 'Query' },
-    { name: 'Bare Acts', icon: 'book', description: 'Access the full text of legal bare acts.', screen: 'Bare Acts' },
-    { name: 'Original Documents', icon: 'file', description: 'Upload and manage your original legal documents.', screen: 'Original Documents' },
-    { name: 'Database', icon: 'database', description: 'Explore a collection of legal documents and case law.', screen: 'Database' },
-    { name: 'FIR Builder', icon: 'clipboard', description: 'Generate and download FIR documents.', screen: 'FIR Download' },
-   // { name: 'Official FIR Format', icon: 'file-o', description: 'View and download the official FIR format.', screen: 'Official FIR Format' },
-   // { name: isLoggedIn ? 'Profile' : 'Login', icon: isLoggedIn ? 'user' : 'sign-in', description: isLoggedIn ? 'View your profile and settings.' : 'Login to access your profile.', screen: isLoggedIn ? 'Profile' : 'Login' },
-    { name: 'Settings', icon: 'cogs', description: 'Manage app settings and preferences.', screen: 'Settings' },
+    {
+      name: 'AI Lawyer',
+      icon: 'chatbubbles',
+      description: 'Ask legal queries and get instant AI-powered answers.',
+      screen: 'Query',
+      color: '#2563EB'
+    },
+    {
+      name: 'Bare Acts',
+      icon: 'library',
+      description: 'Access complete legal bare acts and legislation.',
+      screen: 'Bare Acts',
+      color: '#059669'
+    },
+    {
+      name: 'Original Documents',
+      icon: 'document-text',
+      description: 'Download and manage official legal documents.',
+      screen: 'Original Documents',
+      color: '#DC2626'
+    },
+    {
+      name: 'Database',
+      icon: 'server',
+      description: 'Explore legal case database and precedents.',
+      screen: 'Database',
+      color: '#7C3AED'
+    },
+    {
+      name: 'FIR Builder',
+      icon: 'create',
+      description: 'Generate and customize FIR documents easily.',
+      screen: 'FIR Download',
+      color: '#EA580C'
+    },
+    {
+      name: 'Settings',
+      icon: 'settings',
+      description: 'Customize your app preferences and settings.',
+      screen: 'Settings',
+      color: '#6B7280'
+    },
   ];
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Law AI</Text>
-        <Text style={styles.subHeaderText}>Navigate through the tools and resources below</Text>
-      </View>
+    <View style={styles.container}>
+      <UtilityHeader />
 
-      <View style={styles.menuItems}>
-        {menuItems.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => navigation.navigate(item.screen)}
-            style={styles.menuItem}
-          >
-            <View style={styles.itemContent}>
-              <View style={styles.iconWrapper}>
-                <Icon name={item.icon as any} size={40} color="#2563EB" />
-              </View>
-              <View style={styles.textContainer}>
-                <Text style={styles.menuText}>{item.name}</Text>
-                <Text style={styles.menuDescription}>{item.description}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </ScrollView>
+      <ScrollView
+        style={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.contentContainer}
+      >
+        <View style={styles.grid}>
+          {menuItems.map((item, index) => (
+            <UtilityCard
+              key={index}
+              name={item.name}
+              icon={item.icon}
+              description={item.description}
+              color={item.color}
+              onPress={() => navigation.navigate(item.screen)}
+            />
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  contentContainer: {
     padding: 20,
-    marginBottom: 20,
-    backgroundColor: '#f4f4f4',
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  headerText: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#1e3a8a', // Dark Blue
-  },
-  subHeaderText: {
-    fontSize: 16,
-    color: '#555',
-    marginTop: 5,
-  },
-  menuItems: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  menuItem: {
-    width: '48%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  itemContent: {
-    alignItems: 'center',
-  },
-  iconWrapper: {
-    backgroundColor: '#b3d9f7',
-    padding: 15,
-    borderRadius: 30,
-    marginBottom: 10,
-  },
-  textContainer: {
-    alignItems: 'center',
-  },
-  menuText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e3a8a', // Dark Blue for menu text
-    textAlign: 'center',
-  },
-  menuDescription: {
-    fontSize: 12,
-    color: '#555', // Keep description text in gray
-    textAlign: 'center',
+  grid: {
+    // Cards will stack vertically with marginBottom
   },
 });
 
