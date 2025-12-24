@@ -1,0 +1,21 @@
+export type RootStackParamList = {
+  Home: undefined;
+  Settings: undefined;
+  Login: undefined;
+  Database: undefined;
+  Query: undefined;
+  'Bare Acts': undefined;
+  Download: undefined;
+  Team: undefined;
+  'Privacy Policy': undefined;
+  Accessibility: undefined;
+  Terms: undefined;
+  'FIR Download': undefined;
+  Utilities: undefined;
+  'Original Documents': undefined;
+  'Official FIR Format': undefined;
+  Vision: undefined;
+  'Key Features': undefined;
+  Contact: undefined;
+  NotFound: undefined;
+};

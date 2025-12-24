@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, StyleSheet } from 'react-native';
+import { RootStackParamList } from './types';
 import Landing from './pages/Landing';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
@@ -21,7 +22,7 @@ import KeyFeatures from './pages/KeyFeatures';
 import Vision from './pages/Vision';
 import Contact from './pages/Contact';
 // Create the stack navigator
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App() {
   return (
