@@ -92,16 +92,16 @@ const MenuBar = () => {
             <TouchableOpacity onPress={() => navigation.navigate('Query')} style={styles.menuItem}>
               <Text style={styles.menuText}>AI Lawyer</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('BareActs')} style={styles.menuItem}>
+            <TouchableOpacity onPress={() => navigation.navigate('Bare Acts')} style={styles.menuItem}>
               <Text style={styles.menuText}>Bare Acts</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Database')} style={styles.menuItem}>
               <Text style={styles.menuText}>Database</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('FIRDownload')} style={styles.menuItem}>
+            <TouchableOpacity onPress={() => navigation.navigate('FIR Download')} style={styles.menuItem}>
               <Text style={styles.menuText}>FIR Builder</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate(isLoggedIn ? 'Profile' : 'Login')} style={styles.menuItem}>
+            <TouchableOpacity onPress={() => navigation.navigate(isLoggedIn ? 'Settings' : 'Login')} style={styles.menuItem}>
               <Text style={styles.menuText}>{isLoggedIn ? 'Logged In' : 'Login'}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.menuItem}>
